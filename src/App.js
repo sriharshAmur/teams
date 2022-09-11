@@ -19,6 +19,7 @@ import UserContext from "./context/user/UserContext";
 import TeamState from "./context/team/TeamState";
 import ChatState from "./context/chat/ChatState";
 import HomePage from "./pages/HomePage";
+import NotFound from "./pages/NotFound";
 
 // require("dotenv").config();
 // l
@@ -34,7 +35,11 @@ function App() {
                 <Routes>
                   <Route path="/auth/*" element={<AuthPage />} />
                   <Route path="/" exact element={<HomePage />} />
-                  <Route path="/*" element={<TeamsApp />} />
+                  <Route
+                    path={"/teams/*" || "/chats/*"}
+                    element={<TeamsApp />}
+                  />
+                  <Route path="/*" element={<NotFound />} />
                 </Routes>
               </div>
             </div>

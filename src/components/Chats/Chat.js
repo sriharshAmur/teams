@@ -120,7 +120,7 @@ const Chat = () => {
   };
 
   return (
-    <div className=" w-full  overflow-hidden    bg-gray-100 box-border">
+    <div className=" w-full  overflow-hidden   drop-shadow  bg-gray-50 box-border">
       <div className="py-2  px-4 border-2 h-16 flex justify-between items-center">
         <div className="flex items-center">
           <ProfileImage size={"m"} value={chatName} />

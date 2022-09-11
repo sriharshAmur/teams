@@ -61,7 +61,7 @@ const Chats = () => {
   const { uid, chats } = userContext;
 
   return (
-    <div className="border-r-2 w-2/6 max-w-sm h-full pt-4 bg-gray-200 ">
+    <div className="w-2/6 max-w-sm h-full pt-4 bg-gray-100 ">
       <div className=" border-b-2 border-gray-300 pb-4">
         <div className="px-4 flex w-full justify-between items-center">
           <div className="font-bold text-xl">Chat</div>

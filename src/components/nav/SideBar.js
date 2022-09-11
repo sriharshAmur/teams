@@ -55,7 +55,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="w-20 border-r-2 bg-gray-300 py-2 h-full  flex flex-col justify-between items-center ">
+    <div className="w-20 border-r-2 bg-gray-200 py-2 h-full  flex flex-col justify-between items-center ">
       <div className="flex flex-col w-full ">
         {navItems.map((nav) => {
           let active = false;

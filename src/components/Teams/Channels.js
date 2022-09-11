@@ -46,7 +46,7 @@ const Channels = () => {
   }, [teamId, uid]);
 
   return (
-    <div className="border-r-2 border-black w-2/6 max-w-sm pt-4 h-full bg-gray-200">
+    <div className=" w-2/6 max-w-sm pt-4 h-full bg-gray-100">
       <div className="px-4 ">
         <div className="flex items-center cursor-pointer hover:bg-gray-100 w-fit pr-2 rounded">
           <IoIosArrowBack size={15} />

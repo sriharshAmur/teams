@@ -6,6 +6,8 @@ import {
   MdOutlineInfo,
   MdInfo,
   MdSettings,
+  MdEdit,
+  MdDone,
 } from "react-icons/md";
 import ChatMessage from "../message/ChatMessage";
 import { Link, useParams } from "react-router-dom";
@@ -19,6 +21,7 @@ import {
   orderBy,
   query,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import UserContext from "../../context/user/UserContext";
@@ -31,12 +34,16 @@ const Chat = () => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
-  const inputRef = useRef(null);
   const [reply, setReply] = useState("");
-  const userContext = useContext(UserContext);
-  const { uid, name } = userContext;
   const [infoToggle, setInfoToggle] = useState(false);
+  const [editName, setEditName] = useState(false);
+  const [newName, setNewName] = useState("");
+
+  const userContext = useContext(UserContext);
   const chatContext = useContext(ChatContext);
+  const { uid, name } = userContext;
+
+  const inputRef = useRef(null);
 
   const { setChatDetails, clearChat, name: chatName, joinID } = chatContext;
 
@@ -119,12 +126,49 @@ const Chat = () => {
     }
   };
 
+  const handleEditName = async () => {
+    setEditName(false);
+    console.log(newName);
+
+    // update chat name
+    const chatDoc = doc(db, "test-chat", chatId);
+    await updateDoc(chatDoc, {
+      name: newName,
+    });
+  };
+
   return (
     <div className=" w-full  overflow-hidden   drop-shadow  bg-gray-50 box-border">
       <div className="py-2  px-4 border-2 h-16 flex justify-between items-center">
         <div className="flex items-center">
           <ProfileImage size={"m"} value={chatName} />
-          <div className="ml-2 font-bold text-xl">{chatName}</div>
+          {editName ? (
+            <div className=" ">
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="outline-0 ml-2 py-2 px-2 bg-gray-200"
+                autoFocus
+              />
+            </div>
+          ) : (
+            <div className="ml-2 font-bold text-xl">{chatName}</div>
+          )}
+          {editName ? (
+            <div className="ml-2 cursor-pointer " onClick={handleEditName}>
+              <MdDone />
+            </div>
+          ) : (
+            <div
+              className="ml-2 cursor-pointer "
+              onClick={() => {
+                setNewName(chatName);
+                setEditName(true);
+              }}
+            >
+              <MdEdit />
+            </div>
+          )}
         </div>
         <div className="flex items-center">
           <div className="flex items-center justify-between px-2 mx-4 border-2 cursor-pointer ">

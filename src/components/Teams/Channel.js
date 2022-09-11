@@ -1,6 +1,12 @@
 // import { ComposeIcon } from "@fluentui/react-icons-northstar";
 import React, { useState, useRef, useEffect, useContext } from "react";
-import { MdOutlineVideocam, MdOutlineInfo, MdInfo } from "react-icons/md";
+import {
+  MdOutlineVideocam,
+  MdOutlineInfo,
+  MdInfo,
+  MdDone,
+  MdEdit,
+} from "react-icons/md";
 import RateReviewIcon from "@mui/icons-material/RateReviewOutlined";
 import Conversation from "../message/Conversation";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,10 +15,12 @@ import UserContext from "../../context/user/UserContext";
 import {
   addDoc,
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import ChannelInfo from "./ChannelInfo";
@@ -25,13 +33,18 @@ const Channel = () => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
-  const inputRef = useRef(null);
+  const [channelName, setChannelName] = useState();
+  const [infoToggle, setInfoToggle] = useState(false);
+  const [editName, setEditName] = useState(false);
+  const [newName, setNewName] = useState("");
+
   const userContext = useContext(UserContext);
   const teamContext = useContext(TeamContext);
   const { channels } = teamContext;
   const { uid, name } = userContext;
-  const [channelName, setChannelName] = useState();
-  const [infoToggle, setInfoToggle] = useState(false);
+
+  const inputRef = useRef(null);
+
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -61,8 +74,14 @@ const Channel = () => {
   }, [teamId, channelId]);
 
   useEffect(() => {
-    const channelName = channels.find((channel) => channel.id === channelId);
-    setChannelName(channelName?.name);
+    const channelRef = doc(db, "test-team", teamId, "channels", channelId);
+    const unsub = onSnapshot(channelRef, (doc) => {
+      const data = doc.data();
+      setChannelName(data.name);
+    });
+    return () => {
+      unsub();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId, channels]);
 
@@ -109,12 +128,49 @@ const Channel = () => {
     }
   };
 
+  const handleEditName = async () => {
+    setEditName(false);
+    console.log(newName);
+
+    // update chat name
+    const channelDoc = doc(db, "test-team", teamId, "channels", channelId);
+    await updateDoc(channelDoc, {
+      name: newName,
+    });
+  };
+
   return (
     <div className=" w-full overflow-hidden  bg-gray-50 drop-shadow">
       <div className="w-full py-2  px-4 border-2 flex justify-between items-center">
         <div className="flex items-center">
           <ProfileImage size={"m"} value={channelName} />
-          <div className="ml-2 font-bold text-xl">{channelName}</div>
+          {editName ? (
+            <div className=" ">
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="outline-0 ml-2 py-2 px-2 bg-gray-200"
+                autoFocus
+              />
+            </div>
+          ) : (
+            <div className="ml-2 font-bold text-xl">{channelName}</div>
+          )}
+          {editName ? (
+            <div className="ml-2 cursor-pointer " onClick={handleEditName}>
+              <MdDone />
+            </div>
+          ) : (
+            <div
+              className="ml-2 cursor-pointer "
+              onClick={() => {
+                setNewName(channelName);
+                setEditName(true);
+              }}
+            >
+              <MdEdit />
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-between px-2 mx-4 border-2 cursor-pointer ">

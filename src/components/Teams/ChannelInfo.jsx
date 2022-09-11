@@ -39,7 +39,7 @@ const ChannelInfo = () => {
         <div>
           {members?.map((member) => {
             return (
-              <div className="my-4">
+              <div className="my-4" key={member.id}>
                 <div className="flex items-center">
                   <div className="mr-2">{member.name}</div>
                   <div className="text-sm px-1  text-gray-500 bg-gray-200">

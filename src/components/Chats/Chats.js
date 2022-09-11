@@ -8,51 +8,6 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 import ProfileImage from "../ProfileImage";
 
-const ChannelItems = [
-  {
-    id: 0,
-    name: "General",
-    date: `${new Date("2021-12-17T03:24:00").getDate()}-${new Date(
-      "2021-12-17T03:24:00"
-    ).getMonth()}`,
-  },
-  {
-    id: 1,
-    name: "Sales",
-    date: `${new Date("2021-12-17T03:24:00").getDate()}-${new Date(
-      "2021-12-17T03:24:00"
-    ).getMonth()}`,
-  },
-  {
-    id: 2,
-    name: "Marketing",
-    date: `${new Date("2021-12-17T03:24:00").getDate()} - ${new Date(
-      "2021-12-17T03:24:00"
-    ).getMonth()}`,
-  },
-  {
-    id: 3,
-    name: "Developer",
-    date: `${new Date("2021-12-17T03:24:00").getDate()}-${new Date(
-      "2021-12-17T03:24:00"
-    ).getMonth()}`,
-  },
-  {
-    id: 4,
-    name: "Legal",
-    date: `${new Date("2021-12-17T03:24:00").getDate()}-${new Date(
-      "2021-12-17T03:24:00"
-    ).getMonth()}`,
-  },
-  {
-    id: 5,
-    name: "HR",
-    date: `${new Date("2021-12-17T03:24:00").getDate()}-${new Date(
-      "2021-12-17T03:24:00"
-    ).getMonth()}`,
-  },
-];
-
 const Chats = () => {
   const match = useMatch({ path: "/chats/:chatId/", end: false });
   const matchChatId = match?.params?.chatId;

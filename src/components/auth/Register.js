@@ -82,8 +82,11 @@ const Register = () => {
 
   const register = (email, password, name) => {
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         const user = userCredential.user;
+        await updateProfile(user, {
+          displayName: name,
+        });
         addUser(user, name);
       })
       .catch((error) => {
@@ -97,6 +100,8 @@ const Register = () => {
     const { uid, email } = user;
     try {
       await setDoc(doc(db, "test-user", `${uid}`), {
+        uid: uid,
+        displayName: name,
         name,
         email,
         inVideoCall: false,

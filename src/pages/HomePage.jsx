@@ -121,7 +121,7 @@ const HomePage = () => {
                           Signin to Teams
                         </div>
                       </Link>
-                      <Link to="/auth/signup">
+                      <Link to="/auth/register">
                         <div className="cursor-pointer bg-blue-600 text-white text-lg font-segoe py-2 px-4 mx-4">
                           Signup to Teams
                         </div>

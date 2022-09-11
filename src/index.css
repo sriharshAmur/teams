@@ -9,3 +9,23 @@
   padding: 0;
   /* font-family: "Montserrat", sans-serif; */
 }
+
+@font-face {
+  font-family: "Segoe UI";
+  src: url("../public/fonts/Segoe UI.ttf");
+}
+
+@font-face {
+  font-family: "Segoe UI Bold";
+  src: url("../public/fonts/Segoe UI Bold.ttf");
+}
+
+@font-face {
+  font-family: "Segoe UI Italic";
+  src: url("../public/fonts/Segoe UI Italic.ttf");
+}
+
+@font-face {
+  font-family: "Segoe UI Bold Italic";
+  src: url("../public/fonts/Segoe UI Bold Italic.ttf");
+}

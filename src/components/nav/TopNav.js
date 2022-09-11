@@ -22,7 +22,7 @@ const TopNav = () => {
 
     const res = signOutUser();
     if (res) {
-      navigate("/auth/login");
+      navigate("/");
     }
   };
 
@@ -40,11 +40,13 @@ const TopNav = () => {
   }, [toggle]);
 
   return (
-    <div className="px-2 min-h-[6vh] max-h-[6vh]  w-full  flex justify-between items-center border-b-2 bg-blue-600">
-      <div className="text-white flex  items-center">
-        <img src="/images/teams.svg" alt="Teams Logo" className="w-8" />
-        Teams
-      </div>
+    <div className="md:px-2 min-h-[6vh] max-h-[6vh]  w-full  flex justify-between items-center border-b-0 bg-blue-600">
+      <Link to="/">
+        <div className="text-white flex  items-center">
+          <img src="/images/teams.svg" alt="Teams Logo" className="w-8" />
+          Teams
+        </div>
+      </Link>
       {user && (
         <div className="w-5/12 flex items-center  rounded">
           <input
@@ -58,21 +60,20 @@ const TopNav = () => {
       )}
       <div className="">
         {user ? (
-          <div className="mx-4  relative">
+          <div className="md:mx-4  relative">
             <div
               className="flex items-center cursor-pointer"
               onClick={() => setToggle((tog) => !tog)}
             >
               <ProfileImage size={"s"} value={name} />
-
-              <div className="text-white ml-2">
+              <div className="text-white ml-2 hidden">
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </div>
             </div>
             {toggle && (
               <div
                 ref={ref}
-                className="absolute top-14 border-2 right-0 z-10 bg-white"
+                className="absolute top-14 border-2 right-0 z-10 bg-white min-w-[150px]"
               >
                 <div className="flex items-center border-b-2 border-gray-300 p-4">
                   <ProfileImage size={"m"} value={name} />

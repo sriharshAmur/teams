@@ -7,29 +7,6 @@ import { doc, getDoc } from "firebase/firestore";
 import UserContext from "../../context/user/UserContext";
 import ProfileImage from "../ProfileImage";
 
-const teamNames = [
-  {
-    id: 1,
-    name: "Team 1",
-  },
-  {
-    id: 2,
-    name: "Team 2",
-  },
-  {
-    id: 3,
-    name: "Team 3",
-  },
-  {
-    id: 4,
-    name: "Team 4",
-  },
-  {
-    id: 5,
-    name: "Team 5",
-  },
-];
-
 const Teams = () => {
   // const [teams, setTeams] = useState([]);
   const [user] = useAuthState(auth);
@@ -50,7 +27,7 @@ const Teams = () => {
         </Link>
       </div>
       <div className="flex justify-start items-center flex-wrap ">
-        {teams.length > 0 &&
+        {teams.length > 0 ? (
           teams.map((team) => {
             return (
               <Link to={`${team.id}`} key={team.id}>
@@ -62,7 +39,12 @@ const Teams = () => {
                 </div>
               </Link>
             );
-          })}
+          })
+        ) : (
+          <div className="ml-4 ">
+            No Teams Found, Try creating or joining one .
+          </div>
+        )}
       </div>
     </div>
   );

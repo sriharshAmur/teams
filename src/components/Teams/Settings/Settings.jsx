@@ -13,7 +13,13 @@ import {
 } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { MdDeleteForever, MdPersonAdd, MdPersonRemove } from "react-icons/md";
+import {
+  MdDeleteForever,
+  MdDone,
+  MdEdit,
+  MdPersonAdd,
+  MdPersonRemove,
+} from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import TeamContext from "../../../context/team/TeamContext";
 import UserContext from "../../../context/user/UserContext";
@@ -26,12 +32,17 @@ const Settings = () => {
   const { teamId } = useParams();
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
+
   const teamContext = useContext(TeamContext);
   const userContext = useContext(UserContext);
   const { name, description, createdBy, owner, joinID, members } = teamContext;
   const { uid, loadUserDetails } = userContext;
+
   const [tab, setTab] = useState("members");
   const [channelList, setChannelList] = useState([]);
+  const [editName, setEditName] = useState(false);
+  const [newName, setNewName] = useState("");
+
   useEffect(() => {
     const channelsRef = collection(db, "test-team", teamId, "channels");
     const q = query(channelsRef, orderBy("createdAt", "asc"));
@@ -143,6 +154,18 @@ const Settings = () => {
     loadUserDetails(user);
     navigate(`/teams`);
   };
+
+  const handleEditName = async () => {
+    setEditName(false);
+    console.log(newName);
+
+    // update chat name
+    const teamDoc = doc(db, "test-team", teamId);
+    await updateDoc(teamDoc, {
+      name: newName,
+    });
+  };
+
   return (
     <div className=" w-full overflow-hidden bg-gray-100 pt-4 px-8">
       <div className="flex items-center mb-8">
@@ -151,7 +174,35 @@ const Settings = () => {
         </div>
         <div className="flex justify-between items-center w-full ">
           <div className="ml-4">
-            <div className="font-semibold text-2xl">{name}</div>
+            <div className="flex items-center">
+              {editName ? (
+                <div className=" ">
+                  <input
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="outline-0 ml-2 py-2 px-2 bg-gray-200"
+                    autoFocus
+                  />
+                </div>
+              ) : (
+                <div className="font-semibold text-2xl">{name}</div>
+              )}
+              {editName ? (
+                <div className="ml-2 cursor-pointer " onClick={handleEditName}>
+                  <MdDone />
+                </div>
+              ) : (
+                <div
+                  className="ml-2 cursor-pointer "
+                  onClick={() => {
+                    setNewName(name);
+                    setEditName(true);
+                  }}
+                >
+                  <MdEdit />
+                </div>
+              )}
+            </div>
             <div className="">{description}</div>
           </div>
           <div className="flex">

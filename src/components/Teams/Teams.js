@@ -1,19 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-import { auth, db } from "../../firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { doc, getDoc } from "firebase/firestore";
-import UserContext from "../../context/user/UserContext";
-import ProfileImage from "../ProfileImage";
+import TeamContext from "../../context/team/TeamContext";
 
 const Teams = () => {
-  // const [teams, setTeams] = useState([]);
-  const [user] = useAuthState(auth);
-  const userContext = useContext(UserContext);
-  const { teams, name } = userContext;
-
-  useEffect(() => {}, []);
+  const teamContext = useContext(TeamContext);
+  const { teams } = teamContext;
 
   return (
     <div className=" overflow-auto h-full p-5  ">

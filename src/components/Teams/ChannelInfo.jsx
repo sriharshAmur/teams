@@ -1,33 +1,56 @@
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import React, { useContext, useState } from "react";
 import { useEffect } from "react";
 import { MdPersonAdd } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import TeamContext from "../../context/team/TeamContext";
 import { db } from "../../firebase";
+import {
+  collection,
+  documentId,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
-const ChannelInfo = () => {
+const ChannelInfo = ({ channel }) => {
   const { teamId, channelId } = useParams();
-  const [description, setDescription] = useState("");
   const teamContext = useContext(TeamContext);
-  const { members } = teamContext;
+  const { teams } = teamContext;
+  const team = teams.find((team) => team.id === teamId);
+  const { members: memberIDs } = team;
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      const channelRef = doc(db, "test-team", teamId, "channels", channelId);
-      const docSnap = await getDoc(channelRef);
-
-      const data = docSnap.data();
-      setDescription(data.description);
-    })();
+    getMeberDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId, channelId]);
+  }, [channelId]);
+
+  const getMeberDetails = async () => {
+    const userRef = collection(db, "test-user");
+    const memberIds = memberIDs.map((member) => member.id);
+    const q = query(userRef, where(documentId(), "in", memberIds));
+    const querySnapshot = await getDocs(q);
+    let memberArr = [];
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      const data = doc.data();
+      const member = {
+        id: doc.id,
+        name: data.name,
+        email: data.email,
+        inVideoCall: data.inVideoCall,
+        role: memberIDs.find((member) => member.id === doc.id).role,
+      };
+      memberArr.push(member);
+    });
+    setMembers(memberArr);
+  };
 
   return (
     <div className=" pt-2 w-[20vw] border-l-2 p-4">
       <div className="mb-8">
         <div className="font-bold my-2 text-sm">About</div>
-        <div className="text-sm">{description}</div>
+        <div className="text-sm">{channel.description}</div>
       </div>
       <div className="mb-8">
         <div className="my-2 flex justify-between items-center">

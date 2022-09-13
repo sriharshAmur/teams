@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPlusSquare, FaTimes } from "react-icons/fa";
+import { FaPlusSquare } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import ChannelItem from "./ChannelItem";

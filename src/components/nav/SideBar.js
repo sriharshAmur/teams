@@ -13,22 +13,22 @@ const navItems = [
   {
     icon: <FaBell size={IMAGE_SIZE} />,
     name: "Activities",
-    link: "activities",
+    link: "/activities",
   },
   {
     icon: <BsFillChatTextFill size={IMAGE_SIZE} />,
     name: "Chats",
-    link: "chats",
+    link: "/chats",
   },
   {
     icon: <RiTeamFill size={IMAGE_SIZE} />,
     name: "Teams",
-    link: "teams",
+    link: "/teams",
   },
   {
     icon: <IoCall size={IMAGE_SIZE} />,
     name: "Calls",
-    link: "calls",
+    link: "/calls",
   },
   //   {
   //     icon: <BiLogOut size={IMAGE_SIZE} />,
@@ -59,7 +59,7 @@ const SideBar = () => {
       <div className="flex flex-col w-full ">
         {navItems.map((nav) => {
           let active = false;
-          if (nav.link === pathname.split("/")[1]) {
+          if (pathname.includes(nav.link)) {
             active = true;
           }
           return (

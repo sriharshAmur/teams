@@ -1,10 +1,6 @@
 import {
   collection,
   doc,
-  getDoc,
-  onSnapshot,
-  orderBy,
-  query,
   arrayRemove,
   deleteDoc,
   getDocs,
@@ -13,13 +9,7 @@ import {
 } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {
-  MdDeleteForever,
-  MdDone,
-  MdEdit,
-  MdPersonAdd,
-  MdPersonRemove,
-} from "react-icons/md";
+import { MdDeleteForever, MdDone, MdEdit } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import TeamContext from "../../../context/team/TeamContext";
 import UserContext from "../../../context/user/UserContext";
@@ -28,44 +18,22 @@ import ProfileImage from "../../ProfileImage";
 import Channels from "./Channels";
 import Members from "./Members";
 
-const Settings = () => {
+const Settings = ({ channelList }) => {
   const { teamId } = useParams();
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
 
   const teamContext = useContext(TeamContext);
   const userContext = useContext(UserContext);
-  const { name, description, createdBy, owner, joinID, members } = teamContext;
-  const { uid, loadUserDetails } = userContext;
+  const { teams } = teamContext;
+  const team = teams.find((team) => team.id === teamId);
+  const { name, description, createdBy, joinID, members } = team;
+  const owner = createdBy === user.uid;
+  const { loadUserDetails } = userContext;
 
   const [tab, setTab] = useState("members");
-  const [channelList, setChannelList] = useState([]);
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState("");
-
-  useEffect(() => {
-    const channelsRef = collection(db, "test-team", teamId, "channels");
-    const q = query(channelsRef, orderBy("createdAt", "asc"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let channelArr = [];
-      querySnapshot.forEach((docu) => {
-        const data = docu.data();
-        const channelId = docu.id;
-        const channelName = data.name;
-        const channelDescription = data.description;
-        channelArr.push({
-          id: channelId,
-          name: channelName,
-          description: channelDescription,
-        });
-      });
-      setChannelList(channelArr);
-    });
-    return () => {
-      unsubscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId]);
 
   const changeTab = (name) => {
     if (tab !== name) {
@@ -73,8 +41,7 @@ const Settings = () => {
     }
   };
 
-  const removeChannel = async (channel) => {
-    const channelId = channel.id;
+  const removeChannel = async (channelId) => {
     // remove channel from channels subcollection (id)
     const conversationRef = collection(
       db,
@@ -86,19 +53,8 @@ const Settings = () => {
     );
     const conversationDocs = await getDocs(conversationRef);
     conversationDocs.forEach(async (con) => {
-      const replyRef = collection(
-        db,
-        "test-team",
-        teamId,
-        "channels",
-        channelId,
-        "conversations",
-        con.id,
-        "replies"
-      );
-      const replyDocs = await getDocs(replyRef);
-      replyDocs.forEach(async (reply) => {
-        const replyDoc = doc(
+      if (con.exists()) {
+        const replyRef = collection(
           db,
           "test-team",
           teamId,
@@ -106,33 +62,44 @@ const Settings = () => {
           channelId,
           "conversations",
           con.id,
-          "replies",
-          reply.id
+          "replies"
         );
-        await deleteDoc(replyDoc);
-      });
-      const conversationDoc = doc(
-        db,
-        "test-team",
-        teamId,
-        "channels",
-        channelId,
-        "conversations",
-        con.id
-      );
-      await deleteDoc(conversationDoc);
+        const replyDocs = await getDocs(replyRef);
+        if (replyDocs.size > 0) {
+          replyDocs.forEach(async (reply) => {
+            const replyDoc = doc(
+              db,
+              "test-team",
+              teamId,
+              "channels",
+              channelId,
+              "conversations",
+              con.id,
+              "replies",
+              reply.id
+            );
+            await deleteDoc(replyDoc);
+          });
+        }
+        const conversationDoc = doc(
+          db,
+          "test-team",
+          teamId,
+          "channels",
+          channelId,
+          "conversations",
+          con.id
+        );
+
+        await deleteDoc(conversationDoc);
+      }
     });
     const channelDoc = doc(db, "test-team", teamId, "channels", channelId);
     await deleteDoc(channelDoc);
 
-    // remove channel from Team's channelList (id, name)
-    const channelObj = {
-      id: channelId,
-      name: channel.name,
-    };
     const teamRef = doc(db, "test-team", teamId);
     await updateDoc(teamRef, {
-      channels: arrayRemove(channelObj),
+      channels: arrayRemove(channelId),
     });
   };
 
@@ -148,7 +115,8 @@ const Settings = () => {
     members.forEach(async (member) => {
       const userRef = doc(db, "test-user", member.id);
       await updateDoc(userRef, {
-        [`teams.${teamId}`]: deleteField(),
+        // [`teams.${teamId}`]: deleteField(),\
+        teams: arrayRemove(teamId),
       });
     });
     loadUserDetails(user);
@@ -157,9 +125,8 @@ const Settings = () => {
 
   const handleEditName = async () => {
     setEditName(false);
-    console.log(newName);
 
-    // update chat name
+    // update Team name
     const teamDoc = doc(db, "test-team", teamId);
     await updateDoc(teamDoc, {
       name: newName,

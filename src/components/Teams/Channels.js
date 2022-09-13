@@ -5,12 +5,11 @@ import { Link, useMatch, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { MdOutlineInfo, MdSettings } from "react-icons/md";
 import UserContext from "../../context/user/UserContext";
-import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 import TeamContext from "../../context/team/TeamContext";
 import ProfileImage from "../ProfileImage";
 
-const Channels = () => {
+const Channels = ({ channelList }) => {
   const { teamId } = useParams();
   const match = useMatch("/teams/:teamId/channels/:channelId");
   const matchChannelId = match?.params?.channelId;
@@ -18,33 +17,15 @@ const Channels = () => {
   const teamContext = useContext(TeamContext);
   const userContext = useContext(UserContext);
   const { uid } = userContext;
-  const {
-    setTeamDetails,
-    clearTeam,
-    name: teamName,
-    channels,
-    joinID,
-  } = teamContext;
-
+  const { teams } = teamContext;
   const [teamInfoToggle, setTeamInfoToggle] = useState(false);
 
-  useEffect(() => {
-    const teamRef = doc(db, "test-team", teamId);
-    const unsub = onSnapshot(teamRef, (doc) => {
-      const data = doc.data();
-      const ownersArr = data.members
-        .filter((m) => m.role === "owner")
-        .map((m) => m.id);
-      const ownerBool = ownersArr.includes(uid);
-      setTeamDetails({ ...data, owner: ownerBool });
-    });
-    return () => {
-      unsub();
-      clearTeam();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId, uid]);
+  if (teams.length === 0) {
+    return <div>Loading...</div>;
+  }
+  const teamDetails = teams.find((team) => team.id === teamId);
 
+  const { name: teamName, channels, joinID } = teamDetails;
   return (
     <div className=" w-2/6 max-w-sm pt-4 h-full bg-gray-100">
       <div className="px-4 ">
@@ -97,9 +78,9 @@ const Channels = () => {
       )}
 
       <div className="mt-4 ">
-        {channels &&
-          channels.length > 0 &&
-          channels.map((channel) => {
+        {channelList &&
+          channelList.length > 0 &&
+          channelList.map((channel) => {
             let active = false;
             if (channel.id === channelId) active = true;
             return (

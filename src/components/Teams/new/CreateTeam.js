@@ -68,22 +68,22 @@ const CreateTeam = () => {
     // Add General Channel to the ChannelList in Team
     const teamRef = doc(db, "test-team", teamId);
     await updateDoc(teamRef, {
-      channels: arrayUnion({ id: channelRef.id, name: "General" }),
+      id: teamId,
+      channels: arrayUnion(channelRef.id),
       members: arrayUnion({
         id: uid,
-        name: username,
-        email: email,
         role: "owner",
       }),
     });
     loadUserDetails(user);
+    // need to wait a bit before navigating to the team
     navigate(`/teams/${teamId}/channels/${channelRef.id}`);
   };
 
   const addTeamInUser = async (teamId) => {
     const userDocRef = doc(db, "test-user", uid);
     await updateDoc(userDocRef, {
-      [`teams.${teamId}`]: name,
+      teams: arrayUnion(teamId),
     });
   };
 

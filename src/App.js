@@ -26,31 +26,24 @@ import NotFound from "./pages/NotFound";
 function App() {
   return (
     <UserState>
-      <TeamState>
-        <ChatState>
-          <Router>
-            <div className="h-screen max-h-screen min-h-screen ">
-              <div className=" flex flex-col w-full h-full ">
-                <TopNav />
-                <Routes>
-                  <Route path="/auth/*" element={<AuthPage />} />
-                  <Route path="/" exact element={<HomePage />} />
-                  <Route
-                    path={"/teams/*" || "/chats/*"}
-                    element={<TeamsApp />}
-                  />
-                  <Route path="/*" element={<NotFound />} />
-                </Routes>
-              </div>
-            </div>
-          </Router>
-        </ChatState>
-      </TeamState>
+      <Router>
+        <div className="h-screen max-h-screen min-h-screen ">
+          <div className=" flex flex-col w-full h-full ">
+            <TopNav />
+            <Routes>
+              <Route path="/auth/*" element={<AuthPage />} />
+              <Route path="/" exact element={<HomePage />} />
+              <Route path="/*" element={<TeamsApp />} />
+            </Routes>
+          </div>
+        </div>
+      </Router>
     </UserState>
   );
 }
 
 const TeamsApp = () => {
+  // security flaw here, the teams are loaded even for 404 page
   const [user, loading, error] = useAuthState(auth);
   let navigate = useNavigate();
   const userContext = useContext(UserContext);
@@ -67,15 +60,20 @@ const TeamsApp = () => {
     return <div>Loading....</div>;
   } else if (user) {
     return (
-      <div className=" flex-1 flex w-full h-full max-h-[94vh]">
-        <SideBar />
-        <div className="flex-1 h-full">
-          <Routes>
-            <Route path="/teams/*" element={<TeamsPage />} />
-            <Route path="/chats/*" element={<ChatsPage />} />
-          </Routes>
-        </div>
-      </div>
+      <TeamState>
+        <ChatState>
+          <div className=" flex-1 flex w-full h-full max-h-[94vh]">
+            <SideBar />
+            <div className="flex-1 h-full">
+              <Routes>
+                <Route path="/teams/*" element={<TeamsPage />} />
+                <Route path="/chats/*" element={<ChatsPage />} />
+                <Route path="/*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </div>
+        </ChatState>
+      </TeamState>
     );
   } else if (error) {
     return <div>Error....</div>;

@@ -1,17 +1,13 @@
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import React, { useContext } from "react";
-import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
+import React from "react";
 import { FaTimes } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import UserContext from "../../../context/user/UserContext";
 import { db } from "../../../firebase";
 import ProfileImage from "../../ProfileImage";
 
 const MemberItem = ({ type, members, creator, owner, removeMember }) => {
   const { teamId } = useParams();
   const options = ["Owner", "Member"];
-  const userContext = useContext(UserContext);
-  const { uid, name, email } = userContext;
 
   const changeRole = async (e, member) => {
     const newMembers = members.map((m) => {
@@ -70,7 +66,7 @@ const MemberItem = ({ type, members, creator, owner, removeMember }) => {
                       onChange={(e) => changeRole(e, member)}
                     >
                       {options.map((op) => (
-                        <option>{op}</option>
+                        <option key={op}>{op}</option>
                       ))}
                     </select>
                   )}

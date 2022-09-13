@@ -27,20 +27,18 @@ import ChannelInfo from "./ChannelInfo";
 import TeamContext from "../../context/team/TeamContext";
 import ProfileImage from "../ProfileImage";
 
-const Channel = () => {
+const Channel = ({ channelList }) => {
   const { teamId, channelId } = useParams();
+  const channel = channelList.find((channel) => channel.id === channelId);
   const [newConversation, setNewConversation] = useState(false);
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
-  const [channelName, setChannelName] = useState();
   const [infoToggle, setInfoToggle] = useState(false);
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState("");
 
   const userContext = useContext(UserContext);
-  const teamContext = useContext(TeamContext);
-  const { channels } = teamContext;
   const { uid, name } = userContext;
 
   const inputRef = useRef(null);
@@ -72,19 +70,6 @@ const Channel = () => {
       unsubscribe();
     };
   }, [teamId, channelId]);
-
-  useEffect(() => {
-    const channelRef = doc(db, "test-team", teamId, "channels", channelId);
-    const unsub = onSnapshot(channelRef, (doc) => {
-      const data = doc.data();
-      setChannelName(data.name);
-    });
-    return () => {
-      unsub();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelId, channels]);
-
   const scrollToBottom = () => {
     inputRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -143,7 +128,7 @@ const Channel = () => {
     <div className=" w-full overflow-hidden  bg-gray-50 drop-shadow">
       <div className="w-full py-2  px-4 border-2 flex justify-between items-center">
         <div className="flex items-center">
-          <ProfileImage size={"m"} value={channelName} />
+          <ProfileImage size={"m"} value={channel.name} />
           {editName ? (
             <div className=" ">
               <input
@@ -154,7 +139,7 @@ const Channel = () => {
               />
             </div>
           ) : (
-            <div className="ml-2 font-bold text-xl">{channelName}</div>
+            <div className="ml-2 font-bold text-xl">{channel.name}</div>
           )}
           {editName ? (
             <div className="ml-2 cursor-pointer " onClick={handleEditName}>
@@ -164,7 +149,7 @@ const Channel = () => {
             <div
               className="ml-2 cursor-pointer "
               onClick={() => {
-                setNewName(channelName);
+                setNewName(channel.name);
                 setEditName(true);
               }}
             >
@@ -237,7 +222,7 @@ const Channel = () => {
             )}
           </div>
         </div>
-        {infoToggle && <ChannelInfo />}
+        {infoToggle && <ChannelInfo channel={channel} />}
       </div>
     </div>
   );
